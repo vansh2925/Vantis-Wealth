@@ -34,6 +34,9 @@ yarn-error.log*
 .env*
 !.env.local.example
 
+# generated one-shot schema (concatenation of src/db/*.sql)
+/src/db/full.sql
+
 # vercel
 .vercel
 

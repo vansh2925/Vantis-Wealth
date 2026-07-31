@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import type { AuthError } from "@supabase/supabase-js";
 import { createServerClientInstance } from "@/lib/supabase/server";
 import {
@@ -31,8 +32,25 @@ function friendlyError(err: AuthError): string {
   return map[err.message] ?? err.message;
 }
 
-function getOrigin(): string {
-  return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+/**
+ * Base origin for auth redirect URLs (email confirmation, password reset, OTP).
+ * Prefers an explicit NEXT_PUBLIC_APP_URL, else derives it from the request
+ * headers so links point to the actual deployment (Vercel, etc.), falling back
+ * to localhost for local dev.
+ */
+async function getOrigin(): Promise<string> {
+  const envOrigin = process.env.NEXT_PUBLIC_APP_URL;
+  if (envOrigin) return envOrigin;
+
+  try {
+    const h = await headers();
+    const proto = h.get("x-forwarded-proto") ?? "http";
+    const host = h.get("x-forwarded-host") ?? h.get("host");
+    if (host) return `${proto}://${host}`;
+  } catch {
+    /* headers unavailable — fall through to default */
+  }
+  return "http://localhost:3000";
 }
 
 export async function signIn(
@@ -71,7 +89,7 @@ export async function signUp(
         currency: parsed.data.currency,
       },
       // emailRedirectTo ensures the verification link returns to the app.
-      emailRedirectTo: `${getOrigin()}/dashboard`,
+      emailRedirectTo: `${await getOrigin()}/dashboard`,
     },
   });
 
@@ -99,7 +117,7 @@ export async function sendOtp(
   const supabase = await createServerClientInstance();
   const { error } = await supabase.auth.signInWithOtp({
     email: parsed.data.email,
-    options: { emailRedirectTo: `${getOrigin()}/dashboard` },
+    options: { emailRedirectTo: `${await getOrigin()}/dashboard` },
   });
 
   if (error) return { error: friendlyError(error) };
@@ -135,7 +153,7 @@ export async function requestPasswordReset(
 
   const supabase = await createServerClientInstance();
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo: `${getOrigin()}/reset-password`,
+    redirectTo: `${await getOrigin()}/reset-password`,
   });
 
   if (error) return { error: friendlyError(error) };
