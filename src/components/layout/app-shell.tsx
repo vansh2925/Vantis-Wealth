@@ -6,6 +6,7 @@ import { MobileNav } from "./mobile-nav";
 import { AppHeader } from "./app-header";
 import { CommandMenu } from "./command-menu";
 import { PageTransition } from "./page-transition";
+import { QuickAdd } from "@/components/transactions/quick-add";
 
 /**
  * The application chrome: collapsible desktop sidebar, mobile sheet nav,
@@ -30,6 +31,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
 
       <CommandMenu />
+      <QuickAdd />
     </div>
   );
 }

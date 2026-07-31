@@ -531,7 +531,7 @@ export interface Database {
         Args: {
           p_user_id: string;
           p_account_id: string;
-          p_category_id: string;
+          p_category_id: string | null;
           p_type: TransactionType;
           p_amount: number;
           p_currency_code: string;
@@ -548,6 +548,23 @@ export interface Database {
       delete_transaction: {
         Args: { p_txn_id: string; p_user_id: string };
         Returns: undefined;
+      };
+      update_transaction: {
+        Args: {
+          p_txn_id: string;
+          p_user_id: string;
+          p_account_id: string;
+          p_category_id: string | null;
+          p_type: TransactionType;
+          p_amount: number;
+          p_currency_code: string;
+          p_date: string;
+          p_merchant?: string | null;
+          p_note?: string | null;
+          p_status?: "cleared" | "pending";
+          p_transfer_account_id?: string | null;
+        };
+        Returns: Database["public"]["Tables"]["transactions"]["Row"];
       };
       handle_new_user: {
         Args: Record<PropertyKey, never>;
