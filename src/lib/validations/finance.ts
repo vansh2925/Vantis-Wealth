@@ -70,6 +70,54 @@ export type AccountValues = z.infer<typeof accountSchema>;
 export type CategoryValues = z.infer<typeof categorySchema>;
 export type TransactionValues = z.infer<typeof transactionSchema>;
 
+export const budgetSchema = z.object({
+  month: z.string().min(1, "Month is required."),
+  amount: z.coerce
+    .number({ message: "Enter a valid budget." })
+    .min(0, "Budget can't be negative.")
+    .finite(),
+  categoryId: z.string().uuid().nullable().optional(),
+  currencyCode: z.string().min(3),
+});
+
+export const goalSchema = z.object({
+  name: z.string().trim().min(1, "Goal name is required.").max(60),
+  targetAmount: z.coerce
+    .number({ message: "Enter a target amount." })
+    .positive("Target must be greater than zero.")
+    .finite(),
+  currentAmount: z.coerce
+    .number({ message: "Enter the saved amount." })
+    .min(0)
+    .finite(),
+  currencyCode: z.string().min(3),
+  targetDate: z.string().nullable().optional(),
+  icon: z.string().min(1),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+  isArchived: z.boolean(),
+});
+
+export const recurringSchema = z.object({
+  type: z.enum(["income", "expense"]),
+  amount: z.coerce
+    .number({ message: "Enter a valid amount." })
+    .positive("Amount must be greater than zero.")
+    .finite(),
+  accountId: z.string().uuid("Select an account."),
+  categoryId: z.string().uuid().nullable().optional(),
+  currencyCode: z.string().min(3),
+  merchant: z.string().trim().max(80).optional().or(z.literal("")),
+  note: z.string().trim().max(500).optional().or(z.literal("")),
+  frequency: z.enum(["daily", "weekly", "monthly", "yearly"]),
+  intervalEvery: z.coerce.number().int().min(1),
+  startDate: z.string().min(1, "Pick a start date."),
+  endDate: z.string().nullable().optional(),
+});
+
+export type BudgetValues = z.infer<typeof budgetSchema>;
+export type GoalValues = z.infer<typeof goalSchema>;
+export type RecurringValues = z.infer<typeof recurringSchema>;
+
 // ── Filter / sort shapes for the transactions page ──────────────────────
 export const transactionFiltersSchema = z.object({
   search: z.string().default(""),

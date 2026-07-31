@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/client";
+import { queryKeys } from "@/lib/supabase/query-keys";
 import { useAuth } from "@/contexts/auth-context";
 
 /**
@@ -19,7 +20,7 @@ export function NotificationBell() {
   const supabase = createClient();
 
   const { data: unread = 0 } = useQuery({
-    queryKey: ["notifications", "unread", user?.id],
+    queryKey: queryKeys.notifications.unread(),
     enabled: !!user,
     queryFn: async () => {
       const { count, error } = await supabase

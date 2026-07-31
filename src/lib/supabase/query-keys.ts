@@ -23,4 +23,21 @@ export const queryKeys = {
   currencies: {
     all: ["currencies"] as const,
   },
+  budgets: {
+    all: ["budgets"] as const,
+    list: (month: string) => ["budgets", "list", month] as const,
+  },
+  goals: {
+    all: ["goals"] as const,
+    list: () => ["goals", "list"] as const,
+  },
+  recurring: {
+    all: ["recurring"] as const,
+    list: () => ["recurring", "list"] as const,
+  },
+  notifications: {
+    all: ["notifications"] as const,
+    list: () => ["notifications", "list"] as const,
+    unread: () => ["notifications", "unread"] as const,
+  },
 };

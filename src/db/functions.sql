@@ -255,6 +255,103 @@ end;
 $$;
 
 -- ────────────────────────────────────────────────────────────────────────
+-- 4c. Process due recurring transactions: create a real transaction for
+-- every active template whose next_run_date has arrived, then advance its
+-- next run. Returns how many were created. Runs in one DB transaction.
+-- ────────────────────────────────────────────────────────────────────────
+create or replace function public.process_due_recurring(p_user_id uuid)
+returns integer
+language plpgsql
+security invoker
+as $$
+declare
+  r record;
+  v_count integer := 0;
+begin
+  for r in
+    select * from public.recurring_transactions
+     where user_id = p_user_id
+       and is_active
+       and account_id is not null
+       and (next_run_date is null or next_run_date <= current_date)
+  loop
+    perform public.create_transaction(
+      p_user_id,
+      r.account_id,
+      r.category_id,
+      r.type,
+      r.amount,
+      r.currency_code,
+      current_date,
+      r.merchant,
+      r.note,
+      'cleared',
+      null,          -- no transfer
+      r.id           -- link back to the recurring template
+    );
+
+    update public.recurring_transactions
+       set last_run_date = current_date,
+           next_run_date = coalesce(
+             r.next_run_date + (interval '1 ' || (
+               case r.frequency
+                 when 'daily'   then 'day'
+                 when 'weekly'  then 'week'
+                 when 'monthly' then 'month'
+                 else 'year'
+               end
+             )) * r.interval_every,
+             current_date + (interval '1 ' || (
+               case r.frequency
+                 when 'daily'   then 'day'
+                 when 'weekly'  then 'week'
+                 when 'monthly' then 'month'
+                 else 'year'
+               end
+             )) * r.interval_every
+           )
+     where id = r.id;
+
+    v_count := v_count + 1;
+  end loop;
+
+  return v_count;
+end;
+$$;
+
+-- ────────────────────────────────────────────────────────────────────────
+-- 4d. Contribute money toward a savings goal (atomic increment).
+-- ────────────────────────────────────────────────────────────────────────
+create or replace function public.contribute_to_goal(
+  p_goal_id uuid,
+  p_user_id uuid,
+  p_amount numeric
+)
+returns public.savings_goals
+language plpgsql
+security invoker
+as $$
+declare
+  v_goal public.savings_goals;
+begin
+  if p_amount <= 0 then
+    raise exception 'Contribution must be greater than zero.';
+  end if;
+
+  update public.savings_goals
+     set current_amount = current_amount + p_amount, updated_at = now()
+   where id = p_goal_id and user_id = p_user_id
+   returning * into v_goal;
+
+  if not found then
+    raise exception 'Goal not found or not owned by user.';
+  end if;
+
+  return v_goal;
+end;
+$$;
+
+-- ────────────────────────────────────────────────────────────────────────
 -- 5. New-user bootstrap: create profile + settings.
 -- Default categories stay shared (user_id NULL) so no copying is needed.
 -- ────────────────────────────────────────────────────────────────────────

@@ -10,6 +10,7 @@ import {
   Bell,
   Settings,
   UserRound,
+  Repeat,
   type LucideIcon,
 } from "lucide-react";
 
@@ -40,6 +41,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { title: "Categories", href: "/categories", icon: Tags },
       { title: "Budgets", href: "/budgets", icon: Wallet },
       { title: "Goals", href: "/goals", icon: PiggyBank },
+      { title: "Recurring", href: "/recurring", icon: Repeat },
     ],
   },
   {

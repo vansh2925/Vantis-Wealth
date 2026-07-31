@@ -570,6 +570,14 @@ export interface Database {
         Args: Record<PropertyKey, never>;
         Returns: unknown;
       };
+      process_due_recurring: {
+        Args: { p_user_id: string };
+        Returns: number;
+      };
+      contribute_to_goal: {
+        Args: { p_goal_id: string; p_user_id: string; p_amount: number };
+        Returns: Database["public"]["Tables"]["savings_goals"]["Row"];
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
