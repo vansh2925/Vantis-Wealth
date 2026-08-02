@@ -1,6 +1,5 @@
 "use client";
 
-import { ArrowRightLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useMoney } from "@/contexts/display-currency-context";
@@ -13,7 +12,7 @@ const SYMBOL: Record<string, string> = { INR: "₹", USD: "$" };
  * and the other one (INR <-> USD), converting values on the fly.
  */
 export function CurrencyToggle({ collapsed }: { collapsed?: boolean }) {
-  const { currency, toggle } = useMoney();
+  const { currency, rate, toggle } = useMoney();
   const symbol = SYMBOL[currency] ?? currency;
 
   const button = (
@@ -28,9 +27,8 @@ export function CurrencyToggle({ collapsed }: { collapsed?: boolean }) {
       {!collapsed && (
         <span className="flex min-w-0 flex-col items-start text-left">
           <span className="text-xs font-medium">Display currency</span>
-          <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-            {currency} <ArrowRightLeft className="h-3 w-3" />
-            {currency === "INR" ? "USD" : "INR"}
+          <span className="text-[11px] text-muted-foreground">
+            ₹ {currency === "INR" ? "⇄" : "≈"} $ · 1 USD = ₹{rate.toFixed(2)}
           </span>
         </span>
       )}
