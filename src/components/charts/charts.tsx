@@ -19,7 +19,6 @@ import {
 import { formatMoney } from "@/lib/money";
 import { chartTick, chartGrid } from "./chart-card";
 import type { CategorySpend, MonthlyPoint, NetWorthPoint } from "@/hooks/use-analytics";
-import { cn } from "@/lib/utils";
 
 function shortMonth(month: string): string {
   const d = new Date(`${month}T00:00:00`);
@@ -172,9 +171,10 @@ export function CategoryDonut({
 }
 
 /**
- * Monthly calendar heatmap: one cell per day, intensity scales with spend.
+ * Daily spending trend: a smooth area chart across the whole month, with
+ * gradient fill and day-of-month axis.
  */
-export function Heatmap({
+export function DailyTrendChart({
   monthKey,
   dailySpending,
   currency,
@@ -185,48 +185,73 @@ export function Heatmap({
 }) {
   const [y, m] = monthKey.split("-").map(Number);
   const daysInMonth = new Date(y, m, 0).getDate();
-  const firstWeekday = (new Date(y, m - 1, 1).getDay() + 6) % 7; // Mon=0
   const spendByDay = new Map(dailySpending.map((d) => [Number(d.date.slice(8, 10)), d.amount]));
+  const data = Array.from({ length: daysInMonth }, (_, i) => ({
+    day: i + 1,
+    amount: spendByDay.get(i + 1) ?? 0,
+  }));
   const maxSpend = Math.max(1, ...dailySpending.map((d) => d.amount));
-  const days: { day: number; amount: number }[] = [];
-  for (let i = 1; i <= daysInMonth; i++) days.push({ day: i, amount: spendByDay.get(i) ?? 0 });
-
-  const cells: (number | null)[] = [
-    ...Array.from({ length: firstWeekday }, () => null),
-    ...days.map((d) => d.day),
-  ];
-
-  function intensity(amount: number): string {
-    if (amount <= 0) return "bg-muted";
-    const t = Math.min(1, amount / maxSpend);
-    if (t < 0.34) return "bg-emerald-200 dark:bg-emerald-900/70";
-    if (t < 0.67) return "bg-emerald-400 dark:bg-emerald-700";
-    if (t < 0.9) return "bg-amber-400 dark:bg-amber-600";
-    return "bg-rose-500 dark:bg-rose-500";
-  }
+  const total = dailySpending.reduce((s, d) => s + d.amount, 0);
+  const avg = daysInMonth ? total / daysInMonth : 0;
 
   return (
     <div>
-      <div className="mb-2 grid grid-cols-7 gap-1 text-center text-[10px] text-muted-foreground">
-        {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((d) => (
-          <span key={d}>{d}</span>
-        ))}
+      <div className="mb-2 flex items-end justify-between">
+        <span className="text-xs text-muted-foreground">
+          {dailySpending.length} spending day{dailySpending.length === 1 ? "" : "s"} · avg{" "}
+          <span className="tabular-nums text-foreground">{formatMoney(avg, currency)}</span>/day
+        </span>
+        <span className="text-xs text-muted-foreground">
+          total <span className="tabular-nums font-medium text-foreground">{formatMoney(total, currency)}</span>
+        </span>
       </div>
-      <div className="grid grid-cols-7 gap-1">
-        {cells.map((day, i) =>
-          day == null ? (
-            <div key={`e-${i}`} />
-          ) : (
-            <div
-              key={day}
-              className={cn("flex aspect-square items-center justify-center rounded-md text-[11px] tabular-nums", intensity(spendByDay.get(day) ?? 0))}
-              title={spendByDay.get(day) ? `${formatMoney(spendByDay.get(day)!, currency)} on day ${day}` : undefined}
-            >
-              {spendByDay.get(day) ? day : ""}
-            </div>
-          )
-        )}
+      <div className="h-56">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={data} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="dailySpend" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.35} />
+                <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} {...chartGrid} />
+            <XAxis
+              dataKey="day"
+              type="number"
+              domain={[1, daysInMonth]}
+              ticks={[1, 8, 15, 22, 29, daysInMonth]}
+              tickFormatter={(v) => (v === daysInMonth ? `${v}` : `${v}`)}
+              tick={chartTick}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis tick={chartTick} axisLine={false} tickLine={false} width={52} domain={[0, (dataMax: number) => Math.max(maxSpend * 1.1, 1)]} />
+            <Tooltip
+              content={({ active, payload, label }) => {
+                if (!active || !payload?.length) return null;
+                const amount = Number(payload[0].value);
+                return (
+                  <div className="rounded-lg border bg-background px-3 py-2 text-xs shadow-md">
+                    <p className="font-medium text-foreground">Day {label}</p>
+                    <p className="tabular-nums text-muted-foreground">{formatMoney(amount, currency)}</p>
+                  </div>
+                );
+              }}
+            />
+            <Area
+              type="monotone"
+              dataKey="amount"
+              name="Spent"
+              stroke="#f43f5e"
+              strokeWidth={2}
+              fill="url(#dailySpend)"
+              dot={false}
+              activeDot={{ r: 4, strokeWidth: 0 }}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
 }
+

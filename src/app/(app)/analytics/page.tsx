@@ -12,7 +12,7 @@ import {
   CashflowChart,
   CategoryDonut,
   NetWorthChart,
-  Heatmap,
+  DailyTrendChart,
 } from "@/components/charts/charts";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { useAuth } from "@/contexts/auth-context";
@@ -179,15 +179,8 @@ export default function AnalyticsPage() {
           {isLoading ? <Skeleton className="h-64" /> : <CategoryDonut data={data!.expenseByCategory} currency={currency} />}
         </ChartCard>
 
-        <ChartCard title="Daily spending" description={monthLabel(month)}>
-          {isLoading ? <Skeleton className="h-40" /> : <Heatmap monthKey={month} dailySpending={data!.dailySpending} currency={currency} />}
-          <div className="mt-3 flex items-center gap-1 text-[10px] text-muted-foreground">
-            <span className="h-3 w-3 rounded bg-muted" /> none
-            <span className="ml-2 h-3 w-3 rounded bg-emerald-300" /> low
-            <span className="ml-2 h-3 w-3 rounded bg-emerald-600" /> medium
-            <span className="ml-2 h-3 w-3 rounded bg-amber-500" /> high
-            <span className="ml-2 h-3 w-3 rounded bg-rose-500" /> highest
-          </div>
+        <ChartCard title="Daily trend" description={`Spending across ${monthLabel(month)}`}>
+          {isLoading ? <Skeleton className="h-56" /> : <DailyTrendChart monthKey={month} dailySpending={data!.dailySpending} currency={currency} />}
         </ChartCard>
       </div>
 
