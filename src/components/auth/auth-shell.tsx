@@ -72,7 +72,7 @@ export function AuthShell({
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           <Link href="/" className="hover:text-foreground">
-            Ledger · Institutional-grade personal finance
+            Vantis Wealth · Institutional-grade personal finance
           </Link>
         </p>
       </motion.div>

@@ -16,12 +16,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Ledger — Personal Finance",
-    template: "%s · Ledger",
+    default: "Vantis Wealth — Personal Finance",
+    template: "%s · Vantis Wealth",
   },
   description:
     "Institutional-grade personal finance, expense tracking, budgeting and analytics.",
-  applicationName: "Ledger",
+  applicationName: "Vantis Wealth",
 };
 
 export const viewport: Viewport = {

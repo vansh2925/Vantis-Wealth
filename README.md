@@ -1,4 +1,4 @@
-# Ledger — Institutional-grade Personal Finance
+# Vantis Wealth — Institutional-grade Personal Finance
 
 A production-ready personal finance & expense analytics SaaS built with
 **Next.js 16 (App Router)**, **TypeScript**, **Tailwind CSS v4**, **shadcn/ui**,

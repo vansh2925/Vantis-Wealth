@@ -1,4 +1,4 @@
-export const APP_NAME = "Ledger";
+export const APP_NAME = "Vantis Wealth";
 export const APP_DESCRIPTION =
   "Institutional-grade personal finance & expense analytics.";
 
