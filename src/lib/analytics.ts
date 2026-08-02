@@ -20,9 +20,9 @@ export function monthKeys(count: number, endMonth = currentMonthKey()): string[]
 /** Half-open range [start, end) for a month key. */
 export function monthRange(monthKey: string): { start: string; end: string } {
   const [y, m] = monthKey.split("-").map(Number);
-  const start = `${y}-${String(m).padStart(2, "0")}-01`;
-  const end = `${y}-${String(m + 1).padStart(2, "0")}-01`;
-  return { start, end };
+  // Date handles the year rollover (month index 12 === next January).
+  const fmt = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+  return { start: fmt(new Date(y, m - 1, 1)), end: fmt(new Date(y, m, 1)) };
 }
 
 export interface HealthInput {

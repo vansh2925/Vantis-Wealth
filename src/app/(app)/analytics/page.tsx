@@ -3,17 +3,33 @@
 import { useMemo, useState } from "react";
 import { TrendingUp, TrendingDown, PiggyBank, Sparkles, Wallet } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import dynamic from "next/dynamic";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatTile } from "@/components/analytics/stat-tile";
 import { ChartCard } from "@/components/charts/chart-card";
-import {
-  IncomeExpenseChart,
-  CashflowChart,
-  CategoryDonut,
-  NetWorthChart,
-  DailyTrendChart,
-} from "@/components/charts/charts";
+
+// Code-split the heavy Recharts bundle — loaded only on the analytics page.
+const IncomeExpenseChart = dynamic(
+  () => import("@/components/charts/charts").then((m) => m.IncomeExpenseChart),
+  { ssr: false, loading: () => <Skeleton className="h-72" /> }
+);
+const CashflowChart = dynamic(
+  () => import("@/components/charts/charts").then((m) => m.CashflowChart),
+  { ssr: false, loading: () => <Skeleton className="h-64" /> }
+);
+const CategoryDonut = dynamic(
+  () => import("@/components/charts/charts").then((m) => m.CategoryDonut),
+  { ssr: false, loading: () => <Skeleton className="h-64" /> }
+);
+const NetWorthChart = dynamic(
+  () => import("@/components/charts/charts").then((m) => m.NetWorthChart),
+  { ssr: false, loading: () => <Skeleton className="h-64" /> }
+);
+const Heatmap = dynamic(
+  () => import("@/components/charts/charts").then((m) => m.Heatmap),
+  { ssr: false, loading: () => <Skeleton className="h-40" /> }
+);
 import { useAnalytics } from "@/hooks/use-analytics";
 import { useAuth } from "@/contexts/auth-context";
 import { formatMoney } from "@/lib/money";
@@ -179,8 +195,15 @@ export default function AnalyticsPage() {
           {isLoading ? <Skeleton className="h-64" /> : <CategoryDonut data={data!.expenseByCategory} currency={currency} />}
         </ChartCard>
 
-        <ChartCard title="Daily trend" description={`Spending across ${monthLabel(month)}`}>
-          {isLoading ? <Skeleton className="h-56" /> : <DailyTrendChart monthKey={month} dailySpending={data!.dailySpending} currency={currency} />}
+        <ChartCard title="Daily spending" description={monthLabel(month)}>
+          {isLoading ? <Skeleton className="h-40" /> : <Heatmap monthKey={month} dailySpending={data!.dailySpending} currency={currency} />}
+          <div className="mt-3 flex items-center gap-1 text-[10px] text-muted-foreground">
+            <span className="h-3 w-3 rounded bg-muted" /> none
+            <span className="ml-2 h-3 w-3 rounded bg-emerald-300" /> low
+            <span className="ml-2 h-3 w-3 rounded bg-emerald-600" /> medium
+            <span className="ml-2 h-3 w-3 rounded bg-amber-500" /> high
+            <span className="ml-2 h-3 w-3 rounded bg-rose-500" /> highest
+          </div>
         </ChartCard>
       </div>
 

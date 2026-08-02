@@ -4,8 +4,10 @@ A production-ready personal finance & expense analytics SaaS built with
 **Next.js 16 (App Router)**, **TypeScript**, **Tailwind CSS v4**, **shadcn/ui**,
 **Supabase** (Auth, PostgreSQL, RLS, Storage) and a minimal, fast, elegant UI.
 
-> **Status: Phase 1 complete** — project architecture, Supabase setup, database
-> schema + RLS, authentication. Builds cleanly (`npm run build`).
+> **Status: All phases complete (1–6)** — auth, dashboard, transactions,
+> accounts, categories, budgets, goals, recurring, notifications, analytics,
+> insights, reports, plus testing and production hardening. Builds cleanly
+> (`npm run build`), typechecks, and `npm run test` passes.
 
 ---
 
@@ -126,14 +128,17 @@ npm run dev        # http://localhost:3000
 | `npm run build`     | Production build (typecheck+lint)  |
 | `npm run start`     | Serve production build             |
 | `npm run lint`      | ESLint                             |
+| `npm run typecheck` | TypeScript type check              |
+| `npm run test`      | Run Vitest unit tests              |
+| `npm run check`     | typecheck + lint + test            |
 
 ---
 
 ## Phase Roadmap
 
 1. ✅ **Phase 1** — Architecture, Supabase, schema, RLS, auth
-2. ⏳ **Phase 2** — Auth UI polish, dashboard layout, sidebar, theme, profile
-3. **Phase 3** — Transactions, categories, accounts, CRUD
-4. **Phase 4** — Budgets, goals, recurring, notifications
-5. **Phase 5** — Analytics, charts, insights, reports
-6. **Phase 6** — Optimization, testing, deployment
+2. ✅ **Phase 2** — Auth UI, dashboard layout, sidebar, theme, profile
+3. ✅ **Phase 3** — Transactions, categories, accounts, CRUD
+4. ✅ **Phase 4** — Budgets, goals, recurring, notifications
+5. ✅ **Phase 5** — Analytics, charts, insights, reports
+6. ✅ **Phase 6** — Optimization, testing, deployment
