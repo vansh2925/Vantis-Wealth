@@ -21,7 +21,7 @@ import {
 import { RecurringFormDialog } from "@/components/recurring/recurring-form-dialog";
 import { useRecurring } from "@/hooks/use-recurring";
 import { useAuth } from "@/contexts/auth-context";
-import { formatMoney } from "@/lib/money";
+import { useMoney } from "@/contexts/display-currency-context";
 import { categoryIcon } from "@/lib/constants/categories";
 import { cn } from "@/lib/utils";
 import type { RecurringTransaction } from "@/types";
@@ -35,6 +35,7 @@ const FREQ_LABEL: Record<string, string> = {
 
 export default function RecurringPage() {
   const { profile } = useAuth();
+  const { format } = useMoney();
   const currency = profile?.currency_code ?? "INR";
   const { recurring, isLoading, toggleActive, deleteRecurring, runDue } = useRecurring();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -125,7 +126,7 @@ export default function RecurringPage() {
                   </div>
                   <div className={cn("text-right font-semibold tabular-nums", isIncome ? "text-emerald-600" : "text-rose-600")}>
                     {isIncome ? "+" : "-"}
-                    {formatMoney(r.amount, r.currency_code || currency)}
+                    {format(r.amount, r.currency_code || currency)}
                   </div>
                   <Switch
                     checked={r.is_active}

@@ -16,7 +16,7 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import { formatMoney } from "@/lib/money";
+import { useMoney } from "@/contexts/display-currency-context";
 import { chartTick, chartGrid } from "./chart-card";
 import type { CategorySpend, MonthlyPoint, NetWorthPoint } from "@/hooks/use-analytics";
 import { cn } from "@/lib/utils";
@@ -39,13 +39,14 @@ function MoneyTooltip({
   currency: string;
   suffix?: string;
 }) {
+  const { format } = useMoney();
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border bg-background px-3 py-2 text-xs shadow-md">
       <p className="font-medium text-foreground">{label == null ? "" : String(label)}</p>
       {payload.map((p, i) => (
         <p key={i} className="tabular-nums text-muted-foreground">
-          {p.name}: {formatMoney(Number(p.value), currency)}
+          {p.name}: {format(Number(p.value), currency)}
           {suffix ? ` ${suffix}` : ""}
         </p>
       ))}
@@ -129,6 +130,7 @@ export function CategoryDonut({
   data: CategorySpend[];
   currency: string;
 }) {
+  const { format } = useMoney();
   const top = data.slice(0, 5);
   const others = data.slice(5).reduce((s, d) => s + d.amount, 0);
   const chartData =
@@ -149,7 +151,7 @@ export function CategoryDonut({
           </PieChart>
         </ResponsiveContainer>
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-2xl font-semibold tabular-nums">{formatMoney(total, currency)}</span>
+          <span className="text-2xl font-semibold tabular-nums">{format(total, currency)}</span>
           <span className="text-xs text-muted-foreground">total spent</span>
         </div>
       </div>
@@ -159,7 +161,7 @@ export function CategoryDonut({
             <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: d.color }} />
             <span className="flex-1 truncate">{d.name}</span>
             <span className="tabular-nums text-muted-foreground">
-              {formatMoney(d.amount, currency)}
+              {format(d.amount, currency)}
             </span>
             <span className="w-9 text-right tabular-nums text-muted-foreground/70">
               {total > 0 ? Math.round((d.amount / total) * 100) : 0}%
@@ -183,6 +185,7 @@ export function Heatmap({
   dailySpending: { date: string; amount: number }[];
   currency: string;
 }) {
+  const { format } = useMoney();
   const [y, m] = monthKey.split("-").map(Number);
   const daysInMonth = new Date(y, m, 0).getDate();
   const firstWeekday = (new Date(y, m - 1, 1).getDay() + 6) % 7; // Mon=0
@@ -220,7 +223,7 @@ export function Heatmap({
             <div
               key={day}
               className={cn("flex aspect-square items-center justify-center rounded-md text-[11px] tabular-nums", intensity(spendByDay.get(day) ?? 0))}
-              title={spendByDay.get(day) ? `${formatMoney(spendByDay.get(day)!, currency)} on day ${day}` : undefined}
+              title={spendByDay.get(day) ? `${format(spendByDay.get(day)!, currency)} on day ${day}` : undefined}
             >
               {spendByDay.get(day) ? day : ""}
             </div>

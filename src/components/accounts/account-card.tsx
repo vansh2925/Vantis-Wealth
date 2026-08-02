@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { formatMoney } from "@/lib/money";
+import { useMoney } from "@/contexts/display-currency-context";
 import { ACCOUNT_TYPE_META } from "@/lib/constants/accounts";
 import { cn } from "@/lib/utils";
 import type { Account } from "@/types";
@@ -23,6 +23,7 @@ interface Props {
 }
 
 export function AccountCard({ account, onEdit, onTransfer, onArchive, onDelete }: Props) {
+  const { format } = useMoney();
   const meta = ACCOUNT_TYPE_META[account.type];
   const Icon = meta.icon;
   const isCredit = account.type === "credit";
@@ -83,7 +84,7 @@ export function AccountCard({ account, onEdit, onTransfer, onArchive, onDelete }
             isCredit && account.balance < 0 && "text-rose-600"
           )}
         >
-          {formatMoney(account.balance, account.currency_code)}
+          {format(account.balance, account.currency_code)}
         </p>
       </CardContent>
     </Card>

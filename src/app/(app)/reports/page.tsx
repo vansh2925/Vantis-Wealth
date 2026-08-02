@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { StatTile } from "@/components/analytics/stat-tile";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { useAuth } from "@/contexts/auth-context";
-import { formatMoney } from "@/lib/money";
+import { useMoney } from "@/contexts/display-currency-context";
 import { currentMonthKey, monthKeys } from "@/lib/analytics";
 import { downloadFile } from "@/lib/export";
 import { categoryIcon } from "@/lib/constants/categories";
@@ -20,6 +20,7 @@ function monthLabel(month: string): string {
 
 export default function ReportsPage() {
   const { profile } = useAuth();
+  const { format } = useMoney();
   const currency = profile?.currency_code ?? "INR";
   const months = useMemo(() => monthKeys(12), []);
   const [month, setMonth] = useState(currentMonthKey());
@@ -73,10 +74,10 @@ export default function ReportsPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile label="Income" value={isLoading ? "—" : formatMoney(data?.income ?? 0, currency)} icon={TrendingUp} tone="positive" />
-        <StatTile label="Expense" value={isLoading ? "—" : formatMoney(data?.expense ?? 0, currency)} icon={TrendingDown} tone="negative" />
-        <StatTile label="Net savings" value={isLoading ? "—" : formatMoney(data?.netSavings ?? 0, currency)} icon={PiggyBank} tone="accent" />
-        <StatTile label="Net worth" value={isLoading ? "—" : formatMoney(data?.netWorthCurrent ?? 0, currency)} icon={Wallet} tone="accent" />
+        <StatTile label="Income" value={isLoading ? "—" : format(data?.income ?? 0, currency)} icon={TrendingUp} tone="positive" />
+        <StatTile label="Expense" value={isLoading ? "—" : format(data?.expense ?? 0, currency)} icon={TrendingDown} tone="negative" />
+        <StatTile label="Net savings" value={isLoading ? "—" : format(data?.netSavings ?? 0, currency)} icon={PiggyBank} tone="accent" />
+        <StatTile label="Net worth" value={isLoading ? "—" : format(data?.netWorthCurrent ?? 0, currency)} icon={Wallet} tone="accent" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -100,7 +101,7 @@ export default function ReportsPage() {
                     <span className="tabular-nums text-muted-foreground">
                       {data!.income > 0 ? Math.round((c.amount / data!.expense) * 100) : 0}%
                     </span>
-                    <span className="w-24 text-right tabular-nums font-medium">{formatMoney(c.amount, currency)}</span>
+                    <span className="w-24 text-right tabular-nums font-medium">{format(c.amount, currency)}</span>
                   </div>
                 );
               })
@@ -124,7 +125,7 @@ export default function ReportsPage() {
                   <span className="flex h-7 w-7 items-center justify-center rounded-md bg-muted text-xs font-medium">{i + 1}</span>
                   <span className="flex-1 truncate text-sm">{t.merchant || t.category?.name || "Expense"}</span>
                   <span className="text-xs text-muted-foreground">{t.category?.name ?? "—"}</span>
-                  <span className="tabular-nums font-medium text-rose-600">{formatMoney(t.amount, currency)}</span>
+                  <span className="tabular-nums font-medium text-rose-600">{format(t.amount, currency)}</span>
                 </div>
               ))
             )}

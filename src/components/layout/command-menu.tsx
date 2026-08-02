@@ -18,7 +18,7 @@ import { NAV_ITEMS_FLAT } from "@/lib/constants/navigation";
 import { useHotkey } from "@/hooks/use-hotkey";
 import { useAuth } from "@/contexts/auth-context";
 import { createClient } from "@/lib/supabase/client";
-import { formatMoney } from "@/lib/money";
+import { useMoney } from "@/contexts/display-currency-context";
 import { cn } from "@/lib/utils";
 
 type PaletteTxn = {
@@ -41,6 +41,7 @@ type PaletteTxn = {
 export function CommandMenu() {
   const router = useRouter();
   const { user } = useAuth();
+  const { format } = useMoney();
   const supabase = createClient();
   const [open, setOpen] = useState(false);
 
@@ -128,7 +129,7 @@ export function CommandMenu() {
                     <span className="flex-1 truncate">{label}</span>
                     <span className="ml-auto pl-3 text-xs tabular-nums text-muted-foreground">
                       {t.type === "expense" ? "-" : "+"}
-                      {formatMoney(t.amount, t.currency_code)}
+                      {format(t.amount, t.currency_code)}
                     </span>
                   </CommandItem>
                 );

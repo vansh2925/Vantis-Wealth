@@ -9,6 +9,7 @@ import { APP_NAME } from "@/lib/constants/app";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarFooter } from "./sidebar-footer";
+import { CurrencyToggle } from "./currency-toggle";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -74,6 +75,10 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           ))}
         </nav>
       </ScrollArea>
+
+      <div className="p-3">
+        <CurrencyToggle collapsed={collapsed} />
+      </div>
 
       <SidebarFooter collapsed={collapsed} />
 

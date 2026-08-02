@@ -12,7 +12,7 @@ import { useBudgets } from "@/hooks/use-budgets";
 import { useGoals } from "@/hooks/use-goals";
 import { useRecurring } from "@/hooks/use-recurring";
 import { useRecentTransactions } from "@/hooks/use-recent-transactions";
-import { formatMoney } from "@/lib/money";
+import { useMoney } from "@/contexts/display-currency-context";
 import { currentMonthKey } from "@/lib/analytics";
 import { categoryIcon } from "@/lib/constants/categories";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,7 @@ const monthLabel = new Date(`${month}T00:00:00`).toLocaleDateString("en-IN", { m
 
 export default function DashboardPage() {
   const { user, profile } = useAuth();
+  const { format } = useMoney();
   const currency = profile?.currency_code ?? "INR";
   const name = profile?.full_name || user?.email?.split("@")[0] || "there";
 
@@ -53,10 +54,10 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile label="Total balance" value={totals.isLoading ? "—" : formatMoney(totals.data?.netWorth ?? 0, currency)} icon={Wallet} tone="accent" />
-        <StatTile label="Income" value={totals.isLoading ? "—" : formatMoney(income, currency)} icon={TrendingUp} tone="positive" />
-        <StatTile label="Expense" value={totals.isLoading ? "—" : formatMoney(expense, currency)} icon={TrendingDown} tone="negative" />
-        <StatTile label="Net savings" value={totals.isLoading ? "—" : formatMoney(netSavings, currency)} icon={PiggyBank} sub={income > 0 ? `${savingsRate}% of income` : undefined} tone={netSavings >= 0 ? "accent" : "negative"} />
+        <StatTile label="Total balance" value={totals.isLoading ? "—" : format(totals.data?.netWorth ?? 0, currency)} icon={Wallet} tone="accent" />
+        <StatTile label="Income" value={totals.isLoading ? "—" : format(income, currency)} icon={TrendingUp} tone="positive" />
+        <StatTile label="Expense" value={totals.isLoading ? "—" : format(expense, currency)} icon={TrendingDown} tone="negative" />
+        <StatTile label="Net savings" value={totals.isLoading ? "—" : format(netSavings, currency)} icon={PiggyBank} sub={income > 0 ? `${savingsRate}% of income` : undefined} tone={netSavings >= 0 ? "accent" : "negative"} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -70,8 +71,8 @@ export default function DashboardPage() {
             {overall ? (
               <div>
                 <div className="flex items-end justify-between">
-                  <span className="text-lg font-semibold tabular-nums">{formatMoney(overall.spent, currency)}</span>
-                  <span className="text-xs text-muted-foreground">of {formatMoney(overall.amount, currency)}</span>
+                  <span className="text-lg font-semibold tabular-nums">{format(overall.spent, currency)}</span>
+                  <span className="text-xs text-muted-foreground">of {format(overall.amount, currency)}</span>
                 </div>
                 <Progress value={Math.min(overall.percent, 100)} className="mt-2 h-2" indicatorClassName={overall.remaining < 0 ? "bg-rose-500" : "bg-emerald-500"} />
               </div>
@@ -88,7 +89,7 @@ export default function DashboardPage() {
                       <div className="flex justify-between text-xs">
                         <span className="truncate">{b.category?.name ?? "Overall"}</span>
                         <span className="tabular-nums text-muted-foreground">
-                          {formatMoney(b.spent, currency)} / {formatMoney(b.amount, currency)}
+                          {format(b.spent, currency)} / {format(b.amount, currency)}
                         </span>
                       </div>
                       <Progress value={Math.min(b.percent, 100)} className="mt-1 h-1.5" indicatorClassName={b.remaining < 0 ? "bg-rose-500" : "bg-blue-500"} />
@@ -146,7 +147,7 @@ export default function DashboardPage() {
                   <span className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">{r.next_run_date?.slice(8, 10)} {new Date(r.next_run_date! + "T00:00:00").toLocaleDateString("en-IN", { month: "short" })}</span>
                     <span className={cn("tabular-nums font-medium", r.type === "income" ? "text-emerald-600" : "text-rose-600")}>
-                      {r.type === "income" ? "+" : "-"}{formatMoney(r.amount, r.currency_code || currency)}
+                      {r.type === "income" ? "+" : "-"}{format(r.amount, r.currency_code || currency)}
                     </span>
                   </span>
                 </div>
@@ -181,6 +182,7 @@ export default function DashboardPage() {
 }
 
 function TransactionRow({ txn, currency }: { txn: TransactionWithRelations; currency: string }) {
+  const { format } = useMoney();
   const CatIcon = txn.category ? categoryIcon(txn.category.icon) : null;
   return (
     <div className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted/40">
@@ -203,7 +205,7 @@ function TransactionRow({ txn, currency }: { txn: TransactionWithRelations; curr
       </div>
       <div className="flex flex-col items-end">
         <span className={cn("tabular-nums text-sm font-semibold", txn.type === "income" && "text-emerald-600", txn.type === "expense" && "text-rose-600", txn.type === "transfer" && "text-blue-600")}>
-          {txn.type === "expense" ? "-" : "+"}{formatMoney(txn.amount, txn.currency_code || currency)}
+          {txn.type === "expense" ? "-" : "+"}{format(txn.amount, txn.currency_code || currency)}
         </span>
         <span className="text-xs text-muted-foreground">{txn.date}</span>
       </div>

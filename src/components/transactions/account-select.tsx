@@ -2,7 +2,7 @@
 
 import { useAccounts } from "@/hooks/use-accounts";
 import { ACCOUNT_TYPE_META } from "@/lib/constants/accounts";
-import { formatMoney } from "@/lib/money";
+import { useMoney } from "@/contexts/display-currency-context";
 import {
   Select,
   SelectContent,
@@ -26,6 +26,7 @@ export function AccountSelect({
   excludeId,
 }: AccountSelectProps) {
   const { accounts, isLoading } = useAccounts();
+  const { format } = useMoney();
   const list = accounts?.filter((a) => a.id !== excludeId) ?? [];
 
   return (
@@ -47,7 +48,7 @@ export function AccountSelect({
                 <Icon className="h-4 w-4" style={{ color: meta.color }} />
                 <span>{a.name}</span>
                 <span className="ml-auto pl-3 text-xs text-muted-foreground">
-                  {formatMoney(a.balance, a.currency_code)}
+                  {format(a.balance, a.currency_code)}
                 </span>
               </span>
             </SelectItem>

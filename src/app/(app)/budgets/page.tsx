@@ -20,7 +20,7 @@ import {
 import { BudgetFormDialog } from "@/components/budgets/budget-form-dialog";
 import { useBudgets, type BudgetWithSpent } from "@/hooks/use-budgets";
 import { useAuth } from "@/contexts/auth-context";
-import { formatMoney } from "@/lib/money";
+import { useMoney } from "@/contexts/display-currency-context";
 import { categoryIcon } from "@/lib/constants/categories";
 import { cn } from "@/lib/utils";
 
@@ -46,6 +46,7 @@ function BudgetRow({
   onEdit: (b: BudgetWithSpent) => void;
   onDelete: (b: BudgetWithSpent) => void;
 }) {
+  const { format } = useMoney();
   const Icon = budget.category ? categoryIcon(budget.category.icon) : Wallet;
   const color = budget.category?.color ?? "#64748b";
   const over = budget.remaining < 0;
@@ -60,11 +61,11 @@ function BudgetRow({
         <span className="flex items-center gap-2">
           {over && (
             <span className="flex items-center gap-1 text-xs font-medium text-rose-600">
-              <AlertTriangle className="h-3.5 w-3.5" /> Over by {formatMoney(-budget.remaining, currency)}
+              <AlertTriangle className="h-3.5 w-3.5" /> Over by {format(-budget.remaining, currency)}
             </span>
           )}
           <span className="text-sm tabular-nums text-muted-foreground">
-            {formatMoney(budget.spent, currency)} / {formatMoney(budget.amount, currency)}
+            {format(budget.spent, currency)} / {format(budget.amount, currency)}
           </span>
           <div className="flex gap-0.5">
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(budget)}>
@@ -88,6 +89,7 @@ function BudgetRow({
 
 export default function BudgetsPage() {
   const { profile } = useAuth();
+  const { format } = useMoney();
   const currency = profile?.currency_code ?? "INR";
   const month = new Date();
   const monthKey = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-01`;
@@ -143,13 +145,13 @@ export default function BudgetsPage() {
                 <>
                   <div className="flex items-end justify-between">
                     <span className="text-2xl font-semibold tabular-nums">
-                      {formatMoney(overallSpent, currency)}
+                      {format(overallSpent, currency)}
                     </span>
                     <span className="text-sm text-muted-foreground">
-                      of {formatMoney(overall.amount, currency)} ·{" "}
+                      of {format(overall.amount, currency)} ·{" "}
                       <span className={overall.remaining < 0 ? "text-rose-600" : "text-emerald-600"}>
                         {overall.remaining >= 0 ? "left" : "over"}{" "}
-                        {formatMoney(Math.abs(overall.remaining), currency)}
+                        {format(Math.abs(overall.remaining), currency)}
                       </span>
                     </span>
                   </div>

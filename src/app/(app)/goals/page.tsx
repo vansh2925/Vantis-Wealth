@@ -21,7 +21,7 @@ import {
 import { GoalFormDialog } from "@/components/goals/goal-form-dialog";
 import { useGoals } from "@/hooks/use-goals";
 import { useAuth } from "@/contexts/auth-context";
-import { formatMoney } from "@/lib/money";
+import { useMoney } from "@/contexts/display-currency-context";
 import { categoryIcon } from "@/lib/constants/categories";
 import type { SavingsGoal } from "@/types";
 
@@ -37,6 +37,7 @@ function GoalCard({
   onDelete: (g: SavingsGoal) => void;
 }) {
   const { contribute } = useGoals();
+  const { format } = useMoney();
   const [amount, setAmount] = useState("");
   const percent = Math.min(100, Math.round((goal.current_amount / goal.target_amount) * 100));
   const Icon = categoryIcon(goal.icon);
@@ -93,10 +94,10 @@ function GoalCard({
         <div>
           <div className="flex items-end justify-between">
             <span className="text-lg font-semibold tabular-nums">
-              {formatMoney(goal.current_amount, goal.currency_code)}
+              {format(goal.current_amount, goal.currency_code)}
             </span>
             <span className="text-sm text-muted-foreground">
-              of {formatMoney(goal.target_amount, currency)} · {percent}%
+              of {format(goal.target_amount, currency)} · {percent}%
             </span>
           </div>
           <Progress

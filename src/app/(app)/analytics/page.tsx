@@ -32,7 +32,7 @@ const Heatmap = dynamic(
 );
 import { useAnalytics } from "@/hooks/use-analytics";
 import { useAuth } from "@/contexts/auth-context";
-import { formatMoney } from "@/lib/money";
+import { useMoney } from "@/contexts/display-currency-context";
 import {
   currentMonthKey,
   monthKeys,
@@ -58,6 +58,7 @@ const TONE_STYLE: Record<Insight["tone"], string> = {
 
 export default function AnalyticsPage() {
   const { profile } = useAuth();
+  const { format } = useMoney();
   const currency = profile?.currency_code ?? "INR";
   const months = useMemo(() => monthKeys(12), []);
   const [month, setMonth] = useState(currentMonthKey());
@@ -122,10 +123,10 @@ export default function AnalyticsPage() {
 
       {/* KPI tiles */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile label="Total income" value={isLoading ? "—" : formatMoney(data?.income ?? 0, currency)} icon={TrendingUp} tone="positive" />
-        <StatTile label="Total expense" value={isLoading ? "—" : formatMoney(data?.expense ?? 0, currency)} icon={TrendingDown} tone="negative" />
-        <StatTile label="Net savings" value={isLoading ? "—" : formatMoney(data?.netSavings ?? 0, currency)} icon={PiggyBank} sub={data && data.income > 0 ? `${Math.round(data.savingsRate)}% of income` : undefined} tone={(data?.netSavings ?? 0) >= 0 ? "accent" : "negative"} />
-        <StatTile label="Net worth" value={isLoading ? "—" : formatMoney(data?.netWorthCurrent ?? 0, currency)} icon={Wallet} tone="accent" />
+        <StatTile label="Total income" value={isLoading ? "—" : format(data?.income ?? 0, currency)} icon={TrendingUp} tone="positive" />
+        <StatTile label="Total expense" value={isLoading ? "—" : format(data?.expense ?? 0, currency)} icon={TrendingDown} tone="negative" />
+        <StatTile label="Net savings" value={isLoading ? "—" : format(data?.netSavings ?? 0, currency)} icon={PiggyBank} sub={data && data.income > 0 ? `${Math.round(data.savingsRate)}% of income` : undefined} tone={(data?.netSavings ?? 0) >= 0 ? "accent" : "negative"} />
+        <StatTile label="Net worth" value={isLoading ? "—" : format(data?.netWorthCurrent ?? 0, currency)} icon={Wallet} tone="accent" />
       </div>
 
       {/* Insights */}
@@ -244,7 +245,7 @@ export default function AnalyticsPage() {
                     {t.category?.name ?? "—"} · {t.date}
                   </p>
                 </div>
-                <span className="tabular-nums font-semibold text-rose-600">{formatMoney(t.amount, currency)}</span>
+                <span className="tabular-nums font-semibold text-rose-600">{format(t.amount, currency)}</span>
               </div>
             ))
           )}

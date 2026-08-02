@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { formatMoney } from "@/lib/money";
+import { useMoney } from "@/contexts/display-currency-context";
 import { categoryIcon } from "@/lib/constants/categories";
 import type { TransactionWithRelations } from "@/types";
 
@@ -46,6 +46,7 @@ export function TransactionTable({
   onDelete,
   onDuplicate,
 }: Props) {
+  const { format } = useMoney();
   const allSelected = rows.length > 0 && rows.every((r) => selected.has(r.id));
 
   return (
@@ -141,7 +142,7 @@ export function TransactionTable({
                     )}
                   >
                     {txn.type === "expense" ? "-" : "+"}
-                    {formatMoney(txn.amount, txn.currency_code || currency)}
+                    {format(txn.amount, txn.currency_code || currency)}
                   </TableCell>
                   <TableCell>
                     <Badge variant={txn.status === "cleared" ? "secondary" : "outline"}>

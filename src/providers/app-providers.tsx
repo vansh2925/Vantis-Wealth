@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/auth-context";
 import { ThemeProvider } from "@/contexts/theme-context";
+import { DisplayCurrencyProvider } from "@/contexts/display-currency-context";
 import { QueryProvider } from "./query-provider";
 
 /**
@@ -16,10 +17,12 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <ThemeProvider>
       <QueryProvider>
         <AuthProvider>
-          <TooltipProvider delayDuration={150}>
-            {children}
-            <Toaster richColors position="top-right" />
-          </TooltipProvider>
+          <DisplayCurrencyProvider>
+            <TooltipProvider delayDuration={150}>
+              {children}
+              <Toaster richColors position="top-right" />
+            </TooltipProvider>
+          </DisplayCurrencyProvider>
         </AuthProvider>
       </QueryProvider>
     </ThemeProvider>
