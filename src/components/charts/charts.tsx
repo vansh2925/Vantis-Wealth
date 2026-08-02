@@ -190,7 +190,6 @@ export function DailyTrendChart({
     day: i + 1,
     amount: spendByDay.get(i + 1) ?? 0,
   }));
-  const maxSpend = Math.max(1, ...dailySpending.map((d) => d.amount));
   const total = dailySpending.reduce((s, d) => s + d.amount, 0);
   const avg = daysInMonth ? total / daysInMonth : 0;
 
@@ -210,22 +209,20 @@ export function DailyTrendChart({
           <AreaChart data={data} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="dailySpend" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.35} />
+                <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.28} />
                 <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} {...chartGrid} />
             <XAxis
               dataKey="day"
               type="number"
               domain={[1, daysInMonth]}
               ticks={[1, 8, 15, 22, 29, daysInMonth]}
-              tickFormatter={(v) => (v === daysInMonth ? `${v}` : `${v}`)}
               tick={chartTick}
               axisLine={false}
               tickLine={false}
             />
-            <YAxis tick={chartTick} axisLine={false} tickLine={false} width={52} domain={[0, (dataMax: number) => Math.max(maxSpend * 1.1, 1)]} />
+            <YAxis hide />
             <Tooltip
               content={({ active, payload, label }) => {
                 if (!active || !payload?.length) return null;
