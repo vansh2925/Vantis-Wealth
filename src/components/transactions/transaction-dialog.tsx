@@ -23,6 +23,7 @@ import { useTransactionMutations } from "@/hooks/use-transaction-mutations";
 import { useAuth } from "@/contexts/auth-context";
 import { AccountSelect } from "./account-select";
 import { CategorySelect } from "./category-select";
+import { CurrencyPicker } from "@/components/common/currency-picker";
 import type { TransactionWithRelations } from "@/types";
 
 interface Prefill {
@@ -163,9 +164,18 @@ export function TransactionDialog({
             })}
           </div>
 
+          {/* Currency */}
+          <div className="flex items-center justify-between">
+            <Label>Currency</Label>
+            <CurrencyPicker
+              value={form.watch("currencyCode")}
+              onValueChange={(v) => form.setValue("currencyCode", v, { shouldValidate: true })}
+            />
+          </div>
+
           {/* Amount */}
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount ({currency})</Label>
+            <Label htmlFor="amount">Amount ({form.watch("currencyCode")})</Label>
             <Input
               id="amount"
               type="number"

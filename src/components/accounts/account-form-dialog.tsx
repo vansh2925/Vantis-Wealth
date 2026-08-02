@@ -22,6 +22,7 @@ import { CATEGORY_COLORS } from "@/lib/constants/categories";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useAuth } from "@/contexts/auth-context";
 import { ColorPicker } from "@/components/common/color-picker";
+import { CurrencyPicker } from "@/components/common/currency-picker";
 import type { Account } from "@/types";
 
 interface Props {
@@ -127,7 +128,7 @@ export function AccountFormDialog({ open, onOpenChange, editing }: Props) {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="balance">Balance</Label>
+              <Label htmlFor="balance">Balance ({form.watch("currencyCode")})</Label>
               <Input
                 id="balance"
                 type="number"
@@ -140,6 +141,14 @@ export function AccountFormDialog({ open, onOpenChange, editing }: Props) {
                 <p className="text-sm text-destructive">{form.formState.errors.balance.message}</p>
               )}
             </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <Label>Currency</Label>
+            <CurrencyPicker
+              value={form.watch("currencyCode")}
+              onValueChange={(v) => form.setValue("currencyCode", v, { shouldValidate: true })}
+            />
           </div>
 
           <div className="space-y-2">

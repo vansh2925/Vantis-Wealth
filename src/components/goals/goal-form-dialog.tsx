@@ -14,6 +14,7 @@ import { goalSchema, type GoalValues } from "@/lib/validations/finance";
 import { useGoals } from "@/hooks/use-goals";
 import { useAuth } from "@/contexts/auth-context";
 import { ColorPicker } from "@/components/common/color-picker";
+import { CurrencyPicker } from "@/components/common/currency-picker";
 import { CATEGORY_ICONS, CATEGORY_COLORS } from "@/lib/constants/categories";
 import type { SavingsGoal } from "@/types";
 
@@ -103,16 +104,24 @@ export function GoalFormDialog({ open, onOpenChange, editing }: Props) {
             )}
           </div>
 
+          <div className="flex items-center justify-between">
+            <Label>Currency</Label>
+            <CurrencyPicker
+              value={form.watch("currencyCode")}
+              onValueChange={(v) => form.setValue("currencyCode", v, { shouldValidate: true })}
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="target">Target amount</Label>
+              <Label htmlFor="target">Target amount ({form.watch("currencyCode")})</Label>
               <Input id="target" type="number" step="0.01" inputMode="decimal" placeholder="0.00" {...form.register("targetAmount", { valueAsNumber: true })} />
               {form.formState.errors.targetAmount && (
                 <p className="text-sm text-destructive">{form.formState.errors.targetAmount.message}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="current">Saved so far</Label>
+              <Label htmlFor="current">Saved so far ({form.watch("currencyCode")})</Label>
               <Input id="current" type="number" step="0.01" inputMode="decimal" placeholder="0.00" {...form.register("currentAmount", { valueAsNumber: true })} />
             </div>
           </div>

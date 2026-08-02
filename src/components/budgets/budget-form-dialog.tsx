@@ -21,6 +21,7 @@ import { useBudgets } from "@/hooks/use-budgets";
 import { useCategories } from "@/hooks/use-categories";
 import { useAuth } from "@/contexts/auth-context";
 import { categoryIcon } from "@/lib/constants/categories";
+import { CurrencyPicker } from "@/components/common/currency-picker";
 import type { BudgetWithSpent } from "@/hooks/use-budgets";
 
 function currentMonth(): string {
@@ -128,8 +129,16 @@ export function BudgetFormDialog({ open, onOpenChange, editing }: Props) {
             </Select>
           </div>
 
+          <div className="flex items-center justify-between">
+            <Label>Currency</Label>
+            <CurrencyPicker
+              value={form.watch("currencyCode")}
+              onValueChange={(v) => form.setValue("currencyCode", v, { shouldValidate: true })}
+            />
+          </div>
+
           <div className="space-y-2">
-            <Label htmlFor="amount">Monthly limit</Label>
+            <Label htmlFor="amount">Monthly limit ({form.watch("currencyCode")})</Label>
             <Input
               id="amount"
               type="number"

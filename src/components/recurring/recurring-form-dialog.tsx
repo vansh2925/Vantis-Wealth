@@ -22,6 +22,7 @@ import { useRecurring } from "@/hooks/use-recurring";
 import { useAuth } from "@/contexts/auth-context";
 import { AccountSelect } from "@/components/transactions/account-select";
 import { CategorySelect } from "@/components/transactions/category-select";
+import { CurrencyPicker } from "@/components/common/currency-picker";
 import type { RecurringTransaction } from "@/types";
 
 interface Props {
@@ -140,9 +141,17 @@ export function RecurringFormDialog({ open, onOpenChange, editing }: Props) {
             })}
           </div>
 
+          <div className="flex items-center justify-between">
+            <Label>Currency</Label>
+            <CurrencyPicker
+              value={form.watch("currencyCode")}
+              onValueChange={(v) => form.setValue("currencyCode", v, { shouldValidate: true })}
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="amount">Amount</Label>
+              <Label htmlFor="amount">Amount ({form.watch("currencyCode")})</Label>
               <Input id="amount" type="number" step="0.01" min="0" inputMode="decimal" placeholder="0.00" {...form.register("amount", { valueAsNumber: true })} />
               {form.formState.errors.amount && (
                 <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
